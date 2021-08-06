@@ -2,5 +2,6 @@
 #define CONFIG_H 1
 
 #define BUILDFILE_FILEPATH "buildfile"
+#define DEFAULT_PREFIX "/usr/local/"
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../util.h"
 #include "lexer/lexer.h"
 
 #define POP_NEXT_TOKEN(ttype, str)                                             \
@@ -52,13 +53,6 @@ typedef enum DirectiveType_t {
     DIRECTIVE_LANGUAGE,
     DIRECTIVE_OBJECTS,
 } DirectiveType;
-
-char* copy_string(const char* src) {
-    int length = strlen(src);
-    char* new_string = malloc(length + 1);
-    strcpy(new_string, src);
-    return new_string;
-}
 
 DirectiveType parse_directive_type(const char* str) {
     if (strcmp(str, "type") == 0)
