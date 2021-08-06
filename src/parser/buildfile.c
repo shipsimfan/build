@@ -1,39 +1,64 @@
-#include "parser.h"
+#include "buildfile.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "lexer/lexer.h"
+void display_buildfile_type(BuildfileType type) {
+    switch (type) {
+    case BUILDFILE_TYPE_EXECUTABLE:
+        printf("Executable");
+        break;
 
-Buildfile* parse_buildfile(int verbose) {
-    // Tokenize the buildfile
-    TokenChain* tokens = tokenize_buildfile();
-    if (tokens == NULL)
-        return NULL;
+    case BUILDFILE_TYPE_LIBRARY:
+        printf("Library");
+        break;
 
-    if (verbose)
-        display_token_chain(tokens);
+    case BUILDFILE_TYPE_GROUP:
+        printf("Group");
+        break;
 
-    // Parse the tokens
-
-    // Cleanup
-    destroy_token_chain(tokens);
-    return NULL;
+    case BUILDFILE_TYPE_INVALID:
+        printf("Invalid");
+        break;
+    }
 }
 
-void destroy_object(Object* object) {
-    if (object == NULL)
-        return;
-
-    free(object->target);
-    free(object->source);
-    free(object);
+Buildfile* create_buildfile() {
+    Buildfile* buildfile = malloc(sizeof(Buildfile));
+    buildfile->type = BUILDFILE_TYPE_INVALID;
+    buildfile->name = NULL;
+    buildfile->languages = create_languages();
+    buildfile->objects = create_objects();
+    return buildfile;
 }
 
-void destroy_objects(Objects objects) {
-    for (int i = 0; i < objects.buffer_length; i++)
-        destroy_object(objects.buffer[i]);
+void display_buildfile(Buildfile* buildfile) {
+    printf("Buildfile\n");
+    printf("------------------------------\n");
 
-    free(objects.buffer);
+    printf("Type: ");
+    display_buildfile_type(buildfile->type);
+    printf("\n");
+
+    printf("Name: %s\n", buildfile->name);
+
+    if (buildfile->languages->buffer_length > 0) {
+        printf("Languages: [");
+        for (int i = 0; i < buildfile->languages->buffer_length; i++) {
+            display_language(buildfile->languages->buffer[i]);
+            if (i != buildfile->languages->buffer_length - 1)
+                printf(", ");
+        }
+
+        printf("]\n");
+    }
+
+    if (buildfile->objects->buffer_length > 0) {
+        printf("Objects: ");
+        display_objects(buildfile->objects);
+    }
+
+    putchar('\n');
 }
 
 void destroy_buildfile(Buildfile* buildfile) {
@@ -41,8 +66,8 @@ void destroy_buildfile(Buildfile* buildfile) {
         return;
 
     free(buildfile->name);
-    destroy_objects(buildfile->objects);
     destroy_languages(buildfile->languages);
+    destroy_objects(buildfile->objects);
 
     free(buildfile);
 }

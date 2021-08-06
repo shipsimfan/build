@@ -1,10 +1,15 @@
-#ifndef DRIVER_H
-#define DRIVER_H 1
+#ifndef OPTIONS_H
+#define OPTIONS_H 1
 
-enum Command { Invalid, Build, Install, Clean };
+typedef enum Command_t {
+    COMMAND_INVALID,
+    COMMAND_BUILD,
+    COMMAND_INSTALL,
+    COMMAND_CLEAN
+} Command;
 
 typedef struct {
-    enum Command command;
+    Command command;
     char* prefix;
     char* sysroot;
     int verbose;

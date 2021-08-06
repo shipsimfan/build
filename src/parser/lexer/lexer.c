@@ -6,76 +6,48 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../config.h"
-
-Token new_simple_token(enum TokenType type, int line, int column) {
-    Token token;
-    token.type = type;
-    token.string = NULL;
-    token.line = line;
-    token.column = column;
-    return token;
-}
-
-Token new_string_token(char* string, int line, int column) {
-    Token token;
-    token.type = String;
-    token.string = string;
-    token.line = line;
-    token.column = column;
-    return token;
-}
-
-void insert_into_token_chain(TokenChain* token_chain, Token token) {
-    TokenNode* new_node = (TokenNode*)malloc(sizeof(TokenNode));
-    new_node->token = token;
-    new_node->next = NULL;
-
-    if (token_chain->head == NULL) {
-        token_chain->head = new_node;
-        token_chain->tail = new_node;
-    } else {
-        token_chain->tail->next = new_node;
-        token_chain->tail = new_node;
-    }
-}
-
-TokenChain* tokenize_buildfile() {
-    FILE* file = fopen(BUILDFILE_FILEPATH, "r");
+TokenChain* tokenize_buildfile(const char* path) {
+    // Open the buildfile
+    FILE* file = fopen(path, "r");
     if (file == NULL) {
         int err = errno;
-        fprintf(stderr, "Error while opening %s: %s\n", BUILDFILE_FILEPATH,
-                strerror(err));
+        fprintf(stderr, "Error while opening %s: %s\n", path, strerror(err));
         return NULL;
     }
 
-    TokenChain* token_chain = (TokenChain*)malloc(sizeof(TokenChain));
-    token_chain->head = NULL;
-    token_chain->tail = NULL;
-
+    // Prepare variables
+    TokenChain* token_chain = create_token_chain();
     int column = 1;
     int line = 1;
+
+    // Main token loop
     while (1) {
+        // Get next character
         int c = fgetc(file);
         if (c < 0)
             break;
 
+        // Parse character
         if (c == '\n')
-            insert_into_token_chain(token_chain,
-                                    new_simple_token(Newline, line, column));
+            push_token_chain(
+                token_chain,
+                create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
         else if (c == '=')
-            insert_into_token_chain(token_chain,
-                                    new_simple_token(Equals, line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_EQUALS,
+                                                              line, column));
         else if (c == '{')
-            insert_into_token_chain(token_chain,
-                                    new_simple_token(OpenBrace, line, column));
+            push_token_chain(
+                token_chain,
+                create_simple_token(TOKEN_TYPE_OPEN_BRACE, line, column));
         else if (c == '}')
-            insert_into_token_chain(token_chain,
-                                    new_simple_token(CloseBrace, line, column));
+            push_token_chain(
+                token_chain,
+                create_simple_token(TOKEN_TYPE_CLOSE_BRACE, line, column));
         else if (c == ',')
-            insert_into_token_chain(token_chain,
-                                    new_simple_token(Comma, line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_COMMA,
+                                                              line, column));
         else if (isalpha(c)) {
+            // Parse string
             char* buffer = malloc(1);
             int buffer_length = 1;
             int buffer_offset = 0;
@@ -99,8 +71,8 @@ TokenChain* tokenize_buildfile() {
 
             buffer[buffer_offset] = 0;
 
-            insert_into_token_chain(token_chain,
-                                    new_string_token(buffer, line, column));
+            push_token_chain(token_chain,
+                             create_string_token(buffer, line, column));
             continue;
         } else if (!isspace(c)) {
             fprintf(stderr, "Unknown token '%c' at %i:%i\n", c, line, column);
@@ -109,6 +81,7 @@ TokenChain* tokenize_buildfile() {
             return NULL;
         }
 
+        // Adjust column and line
         if (c == '\n') {
             column = 1;
             line++;
@@ -116,87 +89,20 @@ TokenChain* tokenize_buildfile() {
             column++;
     }
 
+    // Check to see if there was an error
     int err = errno;
     if (ferror(file)) {
-        fprintf(stderr, "Error while reading %s: %s\n", BUILDFILE_FILEPATH,
-                strerror(err));
+        fprintf(stderr, "Error while reading %s: %s\n", path, strerror(err));
         destroy_token_chain(token_chain);
         fclose(file);
         return NULL;
     }
 
+    // Cleanup
     fclose(file);
-
-    insert_into_token_chain(token_chain,
-                            new_simple_token(EndOfFile, line, column));
-
+    push_token_chain(token_chain,
+                     create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
+    push_token_chain(token_chain,
+                     create_simple_token(TOKEN_TYPE_END_OF_FILE, line, column));
     return token_chain;
-}
-
-void display_token(Token token) {
-    printf("%i:%i: ", token.line, token.column);
-
-    switch (token.type) {
-    case String:
-        printf("String (\"%s\")", token.string);
-        break;
-
-    case Newline:
-        printf("Newline");
-        break;
-
-    case Equals:
-        printf("Equals");
-        break;
-
-    case OpenBrace:
-        printf("Open brace");
-        break;
-
-    case CloseBrace:
-        printf("Close brace");
-        break;
-
-    case Comma:
-        printf("Comma");
-        break;
-
-    case EndOfFile:
-        printf("End of file");
-        break;
-    }
-
-    putchar('\n');
-}
-
-void display_token_chain(TokenChain* token_chain) {
-    if (token_chain == NULL)
-        return;
-
-    printf("Tokens\n");
-    printf("------------------------------\n");
-    TokenNode* node = token_chain->head;
-    while (node != NULL) {
-        display_token(node->token);
-        node = node->next;
-    }
-
-    printf("\n");
-}
-
-void destroy_token(Token token) { free(token.string); }
-
-void destroy_token_chain(TokenChain* token_chain) {
-    if (token_chain == NULL)
-        return;
-
-    TokenNode* node = token_chain->head;
-    while (node != NULL) {
-        TokenNode* next = node->next;
-        destroy_token(node->token);
-        free(node);
-        node = next;
-    }
-
-    free(token_chain);
 }

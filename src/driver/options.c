@@ -16,23 +16,23 @@ char* copy_path(const char* src) {
     return new;
 }
 
-Options* create_default_options() {
+Options* create_options() {
     Options* options = (Options*)malloc(sizeof(Options));
-    options->command = Build;
+    options->command = COMMAND_BUILD;
     options->prefix = NULL;
     options->sysroot = NULL;
     options->verbose = 0;
     return options;
 }
 
-enum Command parse_command(const char* str) {
+Command parse_command(const char* str) {
     if (strcmp(str, "build") == 0)
-        return Build;
+        return COMMAND_BUILD;
     else if (strcmp(str, "install") == 0)
-        return Install;
+        return COMMAND_INSTALL;
     else if (strcmp(str, "clean") == 0)
-        return Clean;
-    return Invalid;
+        return COMMAND_CLEAN;
+    return COMMAND_INVALID;
 }
 
 void display_version() {
@@ -42,7 +42,7 @@ void display_version() {
 
 Options* parse_arguments(const char* argv[]) {
     // Create default options
-    Options* options = create_default_options();
+    Options* options = create_options();
 
     // Verify first argument
     if (argv[0] == NULL) {
@@ -63,7 +63,7 @@ Options* parse_arguments(const char* argv[]) {
     if (argv[1][0] != '-') {
         i = 2;
         options->command = parse_command(argv[1]);
-        if (options->command == Invalid) {
+        if (options->command == COMMAND_INVALID) {
             fprintf(stderr, "Invalid command '%s'\n", argv[1]);
             return destroy_options(options);
         }

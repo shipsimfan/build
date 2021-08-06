@@ -2,20 +2,19 @@
 #include <stdlib.h>
 
 #include "../parser/parser.h"
+#include "config.h"
 #include "options.h"
 
 int main(int argc, const char* argv[]) {
     // Parse arguments
     Options* options = parse_arguments(argv);
-    if (options == NULL) {
-        fprintf(stderr, "Error while parsing arguments\n");
+    if (options == NULL)
         exit(EXIT_FAILURE);
-    }
 
     // Parse buildfile
-    Buildfile* buildfile = parse_buildfile(options->verbose);
+    Buildfile* buildfile =
+        parse_buildfile(options->verbose, BUILDFILE_FILEPATH);
     if (buildfile == NULL) {
-        fprintf(stderr, "Error while parsing buildfile\n");
         destroy_options(options);
         exit(EXIT_FAILURE);
     }
