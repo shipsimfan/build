@@ -4,10 +4,10 @@
 
 #include "../builder/builder.h"
 #include "../cleaner/cleaner.h"
+#include "../config.h"
 #include "../installer/installer.h"
 #include "../parser/parser.h"
 #include "../util.h"
-#include "config.h"
 #include "options.h"
 
 int main(int argc, const char* argv[]) {
@@ -28,7 +28,7 @@ int main(int argc, const char* argv[]) {
     int status;
     switch (options->command) {
     case COMMAND_BUILD:
-        status = build(buildfile, options->sysroot);
+        status = build(buildfile, options->sysroot, argv[0]);
         break;
 
     case COMMAND_CLEAN:
@@ -36,7 +36,7 @@ int main(int argc, const char* argv[]) {
         break;
 
     case COMMAND_INSTALL:
-        status = build(buildfile, options->sysroot);
+        status = build(buildfile, options->sysroot, argv[0]);
         if (status != 0)
             break;
 
@@ -53,8 +53,6 @@ int main(int argc, const char* argv[]) {
     }
 
     if (status != 0) {
-        fprintf(stderr, "Error while executing command: %s\n",
-                strerror(status));
         destroy_options(options);
         destroy_buildfile(buildfile);
         exit(EXIT_FAILURE);

@@ -3,6 +3,6 @@
 
 #include "../parser/buildfile.h"
 
-int build(Buildfile* buildfile, const char* sysroot);
+int build(Buildfile* buildfile, const char* sysroot, const char* argv_0);
 
 #endif

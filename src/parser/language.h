@@ -18,6 +18,7 @@ void display_language(Language language);
 
 Languages* create_languages();
 void push_languages(Languages* languages, Language language);
+char* construct_command(Languages* languages, const char* sysroot, const char* source, const char* target);
 void destroy_languages(Languages* languages);
 
 #endif
