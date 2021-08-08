@@ -14,6 +14,7 @@ typedef struct {
     int buffer_length;
 } Languages;
 
+char* construct_command_language(Language language, const char* sysroot, const char* source, const char* target);
 void display_language(Language language);
 
 Languages* create_languages();

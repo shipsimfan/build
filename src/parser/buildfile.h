@@ -19,6 +19,7 @@ typedef struct {
 
 Buildfile* create_buildfile();
 void display_buildfile(Buildfile* buildfile);
+char* generate_target_name(Buildfile* buildfile);
 void destroy_buildfile(Buildfile* buildfile);
 
 #endif

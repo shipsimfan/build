@@ -4,16 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* construct_command_language(Language language, const char* sysroot, const char* source, const char* target, const char* extension) {
+char* construct_command_language(Language language, const char* sysroot, const char* source, const char* target) {
+    const char* extension = NULL;
+    for (const char* p = source; *p; p++)
+        if (*p == '.')
+            extension = p;
+
     switch (language) {
     case LANGUAGE_C:
         if (strcmp(extension, ".c") == 0) {
-            int command_length = 38 + strlen(target) + 1 + strlen(source) + 1;
+            int command_length = 41 + strlen(target) + 1 + strlen(source) + 1;
             if (sysroot)
                 command_length += 11 + strlen(sysroot);
 
             char* command = malloc(command_length);
-            strcpy(command, "clang --target=x86_64-los -Wall -g -o ");
+            strcpy(command, "clang --target=x86_64-los -Wall -g -c -o ");
             strcat(command, target);
             strcat(command, " ");
             strcat(command, source);
@@ -96,8 +101,7 @@ void push_languages(Languages* languages, Language language) {
 
     if (languages->buffer_capacity == languages->buffer_length) {
         languages->buffer_capacity *= 2;
-        languages->buffer = realloc(
-            languages->buffer, languages->buffer_capacity * sizeof(Language));
+        languages->buffer = realloc(languages->buffer, languages->buffer_capacity * sizeof(Language));
     }
 
     languages->buffer[languages->buffer_length] = language;
@@ -108,13 +112,8 @@ char* construct_command(Languages* languages, const char* sysroot, const char* s
     if (languages == NULL)
         return NULL;
 
-    const char* extension = NULL;
-    for (const char* p = source; *p; p++)
-        if (*p == '.')
-            extension = p;
-
     for (int i = 0; i < languages->buffer_length; i++) {
-        char* command = construct_command_language(languages->buffer[i], sysroot, source, target, extension);
+        char* command = construct_command_language(languages->buffer[i], sysroot, source, target);
         if (command != NULL)
             return command;
     }

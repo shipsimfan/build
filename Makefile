@@ -7,5 +7,8 @@ CC_FLAGS := -Wall -g
 
 all: $(TARGET)
 
+install: $(TARGET)
+	@cp $(TARGET) /usr/local/bin/
+
 $(TARGET): $(SRC_FILES)
 	$(CC) $(CC_FLAGS) -o $@ $^

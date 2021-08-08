@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void display_buildfile_type(BuildfileType type) {
     switch (type) {
@@ -59,6 +60,25 @@ void display_buildfile(Buildfile* buildfile) {
     }
 
     putchar('\n');
+}
+
+char* generate_target_name(Buildfile* buildfile) {
+    switch (buildfile->type) {
+    case BUILDFILE_TYPE_EXECUTABLE: {
+        char* target = malloc(5 + strlen(buildfile->name));
+        sprintf(target, "%s.app", buildfile->name);
+        return target;
+    }
+
+    case BUILDFILE_TYPE_LIBRARY: {
+        char* target = malloc(6 + strlen(buildfile->name));
+        sprintf(target, "lib%s.a", buildfile->name);
+        return target;
+    }
+
+    default:
+        return NULL;
+    }
 }
 
 void destroy_buildfile(Buildfile* buildfile) {
