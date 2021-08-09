@@ -6,44 +6,43 @@
 #include "../util.h"
 #include "lexer/lexer.h"
 
-#define POP_NEXT_TOKEN(ttype, str)                                             \
-    token = pop_token_chain(token_chain);                                      \
-    if (token == NULL || token->type != ttype) {                               \
-        fprintf(stderr, "Error: Expected %s, instead found (", str);           \
-        if (token == NULL)                                                     \
-            fprintf(stderr, "Null");                                           \
-        else                                                                   \
-            display_token(token, stderr);                                      \
-        fprintf(stderr, ")\n");                                                \
-        destroy_token(token);                                                  \
-        return -1;                                                             \
+#define POP_NEXT_TOKEN(ttype, str)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+    token = pop_token_chain(token_chain);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    if (token == NULL || token->type != ttype) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+        fprintf(stderr, "Error: Expected %s, instead found (", str);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        if (token == NULL)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+            fprintf(stderr, "Null");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        else                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+            display_token(token, stderr);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+        fprintf(stderr, ")\n");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+        destroy_token(token);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+        return -1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
     }
 
-#define POP_NEXT_TOKEN2(type1, type2, str)                                     \
-    token = pop_token_chain(token_chain);                                      \
-    if (token == NULL || (token->type != type1 && token->type != type2)) {     \
-        fprintf(stderr, "Error: Expected %s, instead found (", str);           \
-        if (token == NULL)                                                     \
-            fprintf(stderr, "Null");                                           \
-        else                                                                   \
-            display_token(token, stderr);                                      \
-        fprintf(stderr, ")\n");                                                \
-        destroy_token(token);                                                  \
-        return -1;                                                             \
+#define POP_NEXT_TOKEN2(type1, type2, str)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+    token = pop_token_chain(token_chain);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    if (token == NULL || (token->type != type1 && token->type != type2)) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+        fprintf(stderr, "Error: Expected %s, instead found (", str);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        if (token == NULL)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+            fprintf(stderr, "Null");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        else                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+            display_token(token, stderr);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+        fprintf(stderr, ")\n");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+        destroy_token(token);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+        return -1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
     }
 
-#define POP_NEXT_TOKEN3(type1, type2, type3, str)                              \
-    token = pop_token_chain(token_chain);                                      \
-    if (token == NULL || (token->type != type1 && token->type != type2 &&      \
-                          token->type != type3)) {                             \
-        fprintf(stderr, "Error: Expected %s, instead found (", str);           \
-        if (token == NULL)                                                     \
-            fprintf(stderr, "Null");                                           \
-        else                                                                   \
-            display_token(token, stderr);                                      \
-        fprintf(stderr, ")\n");                                                \
-        destroy_token(token);                                                  \
-        return -1;                                                             \
+#define POP_NEXT_TOKEN3(type1, type2, type3, str)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \
+    token = pop_token_chain(token_chain);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    if (token == NULL || (token->type != type1 && token->type != type2 && token->type != type3)) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+        fprintf(stderr, "Error: Expected %s, instead found (", str);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        if (token == NULL)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+            fprintf(stderr, "Null");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+        else                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+            display_token(token, stderr);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+        fprintf(stderr, ")\n");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+        destroy_token(token);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+        return -1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
     }
 
 typedef enum DirectiveType_t {
@@ -52,6 +51,7 @@ typedef enum DirectiveType_t {
     DIRECTIVE_NAME,
     DIRECTIVE_LANGUAGE,
     DIRECTIVE_OBJECTS,
+    DIRECTIVE_PRIORITY,
 } DirectiveType;
 
 DirectiveType parse_directive_type(const char* str) {
@@ -63,6 +63,8 @@ DirectiveType parse_directive_type(const char* str) {
         return DIRECTIVE_LANGUAGE;
     if (strcmp(str, "objects") == 0)
         return DIRECTIVE_OBJECTS;
+    if (strcmp(str, "priority") == 0)
+        return DIRECTIVE_PRIORITY;
 
     return DIRECTIVE_INVALID;
 }
@@ -144,8 +146,7 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
 
     destroy_token(token);
     while (1) {
-        POP_NEXT_TOKEN3(TOKEN_TYPE_NEWLINE, TOKEN_TYPE_CLOSE_BRACE,
-                        TOKEN_TYPE_STRING, "object name or close curly brace");
+        POP_NEXT_TOKEN3(TOKEN_TYPE_NEWLINE, TOKEN_TYPE_CLOSE_BRACE, TOKEN_TYPE_STRING, "object name or close curly brace");
 
         if (token->type == TOKEN_TYPE_NEWLINE) {
             destroy_token(token);
@@ -168,8 +169,7 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
         POP_NEXT_TOKEN(TOKEN_TYPE_OPEN_BRACE, "open curly brace");
         destroy_token(token);
         while (1) {
-            POP_NEXT_TOKEN3(TOKEN_TYPE_CLOSE_BRACE, TOKEN_TYPE_NEWLINE,
-                            TOKEN_TYPE_STRING, "object directive");
+            POP_NEXT_TOKEN3(TOKEN_TYPE_CLOSE_BRACE, TOKEN_TYPE_NEWLINE, TOKEN_TYPE_STRING, "object directive");
             if (token->type == TOKEN_TYPE_CLOSE_BRACE) {
                 destroy_token(token);
                 break;
@@ -186,8 +186,7 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
             else if (strcmp(token->string, "language") == 0)
                 language = 1;
             else {
-                fprintf(stderr, "Error: invalid object directive '%s'\n",
-                        token->string);
+                fprintf(stderr, "Error: invalid object directive '%s'\n", token->string);
                 destroy_object(object);
                 destroy_token(token);
                 return -1;
@@ -202,9 +201,7 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
 
             if (language) {
                 if (object->language != LANGUAGE_INVALID) {
-                    fprintf(stderr,
-                            "Attempting to set two languages on object %s\n",
-                            object->target);
+                    fprintf(stderr, "Attempting to set two languages on object %s\n", object->target);
                     destroy_object(object);
                     destroy_token(token);
                     return -1;
@@ -212,17 +209,14 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
 
                 object->language = parse_language(token->string);
                 if (object->language == LANGUAGE_INVALID) {
-                    fprintf(stderr, "Error: Invalid language '%s'\n",
-                            token->string);
+                    fprintf(stderr, "Error: Invalid language '%s'\n", token->string);
                     destroy_object(object);
                     destroy_token(token);
                     return -1;
                 }
             } else {
                 if (object->source != NULL) {
-                    fprintf(stderr,
-                            "Attempting to set two sources on object %s\n",
-                            object->target);
+                    fprintf(stderr, "Attempting to set two sources on object %s\n", object->target);
                     destroy_object(object);
                     destroy_token(token);
                     return -1;
@@ -238,15 +232,13 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
         }
 
         if (object->source == NULL) {
-            fprintf(stderr, "No source specified for object %s\n",
-                    object->target);
+            fprintf(stderr, "No source specified for object %s\n", object->target);
             destroy_object(object);
             return -1;
         }
 
         if (object->language == LANGUAGE_INVALID) {
-            fprintf(stderr, "No language specified for object %s\n",
-                    object->target);
+            fprintf(stderr, "No language specified for object %s\n", object->target);
             destroy_object(object);
             return -1;
         }
@@ -258,9 +250,25 @@ int parse_objects(TokenChain* token_chain, Buildfile* buildfile) {
     }
 }
 
+int parse_priority(TokenChain* token_chain, Buildfile* buildfile) {
+    Token* token;
+    while (1) {
+        POP_NEXT_TOKEN(TOKEN_TYPE_STRING, "name");
+        push_priority(buildfile->priority, token->string);
+        destroy_token(token);
+
+        POP_NEXT_TOKEN2(TOKEN_TYPE_COMMA, TOKEN_TYPE_NEWLINE, "comma");
+        if (token->type == TOKEN_TYPE_NEWLINE) {
+            destroy_token(token);
+            return 0;
+        }
+
+        destroy_token(token);
+    }
+}
+
 int parse_directive(TokenChain* token_chain, Buildfile* buildfile) {
-    Token* POP_NEXT_TOKEN2(TOKEN_TYPE_STRING, TOKEN_TYPE_NEWLINE,
-                           "directive name");
+    Token* POP_NEXT_TOKEN2(TOKEN_TYPE_STRING, TOKEN_TYPE_NEWLINE, "directive name");
     if (token->type == TOKEN_TYPE_NEWLINE) {
         destroy_token(token);
         return 0;
@@ -286,6 +294,8 @@ int parse_directive(TokenChain* token_chain, Buildfile* buildfile) {
         return parse_languages(token_chain, buildfile);
     case DIRECTIVE_OBJECTS:
         return parse_objects(token_chain, buildfile);
+    case DIRECTIVE_PRIORITY:
+        return parse_priority(token_chain, buildfile);
     default:
         return -1;
     }

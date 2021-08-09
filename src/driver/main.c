@@ -27,6 +27,9 @@ int main(int argc, const char* argv[]) {
     int status;
     switch (options->command) {
     case COMMAND_BUILD:
+        status = build_priority(buildfile, options->sysroot, argv[0]);
+        if (status < 0)
+            break;
         status = build(buildfile, options->sysroot, argv[0]);
         break;
 
@@ -35,14 +38,18 @@ int main(int argc, const char* argv[]) {
         break;
 
     case COMMAND_INSTALL:
+        if (options->prefix == NULL)
+            options->prefix = copy_string(DEFAULT_PREFIX);
+
+        status = install_priority(buildfile, options->prefix, options->sysroot, argv[0]);
+        if (status < 0)
+            break;
+
         if (options->no_build == 0) {
             status = build(buildfile, options->sysroot, argv[0]);
             if (status != 0)
                 break;
         }
-
-        if (options->prefix == NULL)
-            options->prefix = copy_string(DEFAULT_PREFIX);
         status = install(buildfile, options->prefix, argv[0]);
         break;
 

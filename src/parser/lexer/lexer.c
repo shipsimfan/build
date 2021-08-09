@@ -43,7 +43,7 @@ TokenChain* tokenize_buildfile(const char* path) {
             char* buffer = malloc(1);
             int buffer_length = 1;
             int buffer_offset = 0;
-            while (isalnum(c) || c == '.' || c == '_' || c == '+') {
+            while (isalnum(c) || c == '.' || c == '_' || c == '+' || c == '-') {
                 if (buffer_length == buffer_offset) {
                     buffer_length *= 2;
                     buffer = realloc(buffer, buffer_length);

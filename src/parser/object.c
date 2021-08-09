@@ -34,8 +34,7 @@ void push_objects(Objects* objects, Object* object) {
 
     if (objects->buffer_capacity == objects->buffer_length) {
         objects->buffer_capacity *= 2;
-        objects->buffer =
-            realloc(objects->buffer, objects->buffer_capacity * sizeof(Object));
+        objects->buffer = realloc(objects->buffer, objects->buffer_capacity * sizeof(Object*));
     }
 
     objects->buffer[objects->buffer_length] = object;
@@ -45,8 +44,7 @@ void push_objects(Objects* objects, Object* object) {
 void display_objects(Objects* objects) {
     printf("{\n");
     for (int i = 0; i < objects->buffer_length; i++) {
-        printf("\t%s --> %s (", objects->buffer[i]->source,
-               objects->buffer[i]->target);
+        printf("\t%s --> %s (", objects->buffer[i]->source, objects->buffer[i]->target);
         display_language(objects->buffer[i]->language);
         printf(")\n");
     }

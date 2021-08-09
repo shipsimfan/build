@@ -2,6 +2,7 @@
 #define BUILDFILE_H
 
 #include "object.h"
+#include "priority.h"
 
 typedef enum BuildfileType_t {
     BUILDFILE_TYPE_INVALID,
@@ -15,6 +16,7 @@ typedef struct {
     char* name;
     Languages* languages;
     Objects* objects;
+    Priority* priority;
 } Buildfile;
 
 Buildfile* create_buildfile();

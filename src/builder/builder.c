@@ -37,7 +37,7 @@ void push_built_files(BuiltFiles* dest, BuiltFiles* src) {
         return;
 
     dest->capacity += src->capacity;
-    dest->paths = realloc(dest->paths, dest->capacity);
+    dest->paths = realloc(dest->paths, dest->capacity * sizeof(char*));
     for (int i = 0; i < src->length; i++)
         dest->paths[i + dest->length] = src->paths[i];
 
@@ -54,7 +54,7 @@ void push_built_file(BuiltFiles* dest, char* path, int build) {
 
     if (dest->length == dest->capacity) {
         dest->capacity *= 2;
-        dest->paths = realloc(dest->paths, dest->capacity);
+        dest->paths = realloc(dest->paths, dest->capacity * sizeof(char*));
     }
 
     dest->paths[dest->length] = path;
@@ -156,7 +156,7 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
             }
 
             // Build file if needed
-            char* command = construct_command(buildfile->languages, sysroot, source, target);
+            char* command = construct_command(buildfile->languages, sysroot, source, target, buildfile->type == BUILDFILE_TYPE_LIBRARY);
             if (command != NULL) {
                 push_built_file(built_files, target, build);
                 if (build) {
@@ -185,6 +185,40 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
     return built_files;
 }
 
+int build_priority(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
+    if (buildfile->type != BUILDFILE_TYPE_GROUP || buildfile->priority->queue_length == 0)
+        return 0;
+
+    char* command;
+    if (sysroot) {
+        command = malloc(strlen(argv_0) + 17 + strlen(sysroot) + 1);
+        sprintf(command, "%s build --sysroot %s", argv_0, sysroot);
+    } else {
+        command = malloc(strlen(argv_0) + 7);
+        sprintf(command, "%s build", argv_0);
+    }
+
+    for (int i = 0; i < buildfile->priority->queue_length; i++) {
+        printf("Building %s . . .\n", buildfile->priority->queue[i]);
+
+        // Execute build on the sub-directory
+        chdir(buildfile->priority->queue[i]);
+        int status = system(command);
+        chdir("..");
+
+        if (status != EXIT_SUCCESS) {
+            fprintf(stderr, "Error whild building sub-project '%s'\n", buildfile->priority->queue[i]);
+            free(command);
+            return -1;
+        }
+
+        putchar('\n');
+    }
+
+    free(command);
+    return 0;
+}
+
 int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
     if (buildfile->type == BUILDFILE_TYPE_GROUP) {
         // Open current directory
@@ -211,6 +245,17 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
             if (entry->d_type == DT_DIR) {
                 // Ignore '.', '..', and any hidden folders
                 if (entry->d_name[0] == '.')
+                    continue;
+
+                int done = 0;
+                for (int i = 0; i < buildfile->priority->queue_length; i++) {
+                    if (strcmp(buildfile->priority->queue[i], entry->d_name) == 0) {
+                        done = 1;
+                        break;
+                    }
+                }
+
+                if (done)
                     continue;
 
                 printf("Building %s . . .\n", entry->d_name);
@@ -274,7 +319,7 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
             // Build objects
             for (int i = 0; i < buildfile->objects->buffer_length; i++) {
                 Object* object = buildfile->objects->buffer[i];
-                char* command = construct_command_language(object->language, sysroot, object->source, object->target);
+                char* command = construct_command_language(object->language, sysroot, object->source, object->target, buildfile->type == BUILDFILE_TYPE_LIBRARY);
                 if (command == NULL) {
                     fprintf(stderr, "Invalid source file (%s) for building %s\n", object->source, object->target);
                     free(target_name);

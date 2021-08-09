@@ -98,6 +98,52 @@ int install_directory(const char* source_path, const char* target_path) {
     return 0;
 }
 
+int install_priority(Buildfile* buildfile, const char* prefix, const char* sysroot, const char* argv_0) {
+    if (buildfile->type != BUILDFILE_TYPE_GROUP || buildfile->priority->queue_length == 0)
+        return 0;
+
+    // Create command
+    char* command;
+
+    if (prefix) {
+        if (sysroot) {
+            command = malloc(strlen(argv_0) + 19 + strlen(prefix) + 11 + strlen(sysroot));
+            sprintf(command, "%s install --prefix %s --sysroot %s", argv_0, prefix, sysroot);
+        } else {
+            command = malloc(strlen(argv_0) + 19 + strlen(prefix));
+            sprintf(command, "%s install --prefix %s", argv_0, prefix);
+        }
+    } else {
+        if (sysroot) {
+            command = malloc(strlen(argv_0) + 20 + strlen(sysroot));
+            sprintf(command, "%s install --sysroot %s", argv_0, sysroot);
+        } else {
+            command = malloc(strlen(argv_0) + 9);
+            sprintf(command, "%s install", argv_0);
+        }
+    }
+
+    for (int i = 0; i < buildfile->priority->queue_length; i++) {
+        printf("Installing %s . . .\n", buildfile->priority->queue[i]);
+
+        // Execute build on the sub-directory
+        chdir(buildfile->priority->queue[i]);
+        int status = system(command);
+        chdir("..");
+
+        if (status != EXIT_SUCCESS) {
+            fprintf(stderr, "Error while installing sub-project '%s'\n", buildfile->priority->queue[i]);
+            free(command);
+            return -1;
+        }
+
+        putchar('\n');
+    }
+
+    free(command);
+    return 0;
+}
+
 int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
     if (buildfile->type == BUILDFILE_TYPE_GROUP) {
         // Execute "build install" on subfolders
@@ -126,6 +172,17 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
             if (entry->d_type == DT_DIR) {
                 // Ignore '.', '..', and any hidden folders
                 if (entry->d_name[0] == '.')
+                    continue;
+
+                int done = 0;
+                for (int i = 0; i < buildfile->priority->queue_length; i++) {
+                    if (strcmp(buildfile->priority->queue[i], entry->d_name) == 0) {
+                        done = 1;
+                        break;
+                    }
+                }
+
+                if (done)
                     continue;
 
                 printf("Installing %s . . .\n", entry->d_name);

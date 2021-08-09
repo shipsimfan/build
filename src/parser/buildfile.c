@@ -30,6 +30,7 @@ Buildfile* create_buildfile() {
     buildfile->name = NULL;
     buildfile->languages = create_languages();
     buildfile->objects = create_objects();
+    buildfile->priority = create_priority();
     return buildfile;
 }
 
@@ -88,6 +89,7 @@ void destroy_buildfile(Buildfile* buildfile) {
     free(buildfile->name);
     destroy_languages(buildfile->languages);
     destroy_objects(buildfile->objects);
+    destroy_priority(buildfile->priority);
 
     free(buildfile);
 }
