@@ -106,7 +106,7 @@ int parse_type(TokenChain* token_chain, Buildfile* buildfile) {
 Language parse_language(const char* str) {
     if (strcmp(str, "c") == 0)
         return LANGUAGE_C;
-    if (strcmp(str, "cpp") == 0)
+    if (strcmp(str, "c++") == 0)
         return LANGUAGE_CPP;
     if (strcmp(str, "asm") == 0)
         return LANGUAGE_ASM;

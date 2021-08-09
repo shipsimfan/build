@@ -29,29 +29,21 @@ TokenChain* tokenize_buildfile(const char* path) {
 
         // Parse character
         if (c == '\n')
-            push_token_chain(
-                token_chain,
-                create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
         else if (c == '=')
-            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_EQUALS,
-                                                              line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_EQUALS, line, column));
         else if (c == '{')
-            push_token_chain(
-                token_chain,
-                create_simple_token(TOKEN_TYPE_OPEN_BRACE, line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_OPEN_BRACE, line, column));
         else if (c == '}')
-            push_token_chain(
-                token_chain,
-                create_simple_token(TOKEN_TYPE_CLOSE_BRACE, line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_CLOSE_BRACE, line, column));
         else if (c == ',')
-            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_COMMA,
-                                                              line, column));
+            push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_COMMA, line, column));
         else if (isalpha(c)) {
             // Parse string
             char* buffer = malloc(1);
             int buffer_length = 1;
             int buffer_offset = 0;
-            while (isalnum(c) || c == '.' || c == '_') {
+            while (isalnum(c) || c == '.' || c == '_' || c == '+') {
                 if (buffer_length == buffer_offset) {
                     buffer_length *= 2;
                     buffer = realloc(buffer, buffer_length);
@@ -71,8 +63,7 @@ TokenChain* tokenize_buildfile(const char* path) {
 
             buffer[buffer_offset] = 0;
 
-            push_token_chain(token_chain,
-                             create_string_token(buffer, line, column));
+            push_token_chain(token_chain, create_string_token(buffer, line, column));
             continue;
         } else if (!isspace(c)) {
             fprintf(stderr, "Unknown token '%c' at %i:%i\n", c, line, column);
@@ -100,9 +91,7 @@ TokenChain* tokenize_buildfile(const char* path) {
 
     // Cleanup
     fclose(file);
-    push_token_chain(token_chain,
-                     create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
-    push_token_chain(token_chain,
-                     create_simple_token(TOKEN_TYPE_END_OF_FILE, line, column));
+    push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_NEWLINE, line, column));
+    push_token_chain(token_chain, create_simple_token(TOKEN_TYPE_END_OF_FILE, line, column));
     return token_chain;
 }
