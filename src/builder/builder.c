@@ -74,7 +74,8 @@ void destroy_builtfiles(BuiltFiles* files) {
     free(files);
 }
 
-BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const char* path) {
+BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot,
+                            const char* path) {
     // Create output directory
     int path_length = strlen(path);
     char* target_path = malloc(path_length + 1);
@@ -103,11 +104,13 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
 
         if (entry->d_type == DT_DIR) {
             // Construct new path
-            char* dir_path = malloc(path_length + 1 + strlen(entry->d_name) + 1);
+            char* dir_path =
+                malloc(path_length + 1 + strlen(entry->d_name) + 1);
             sprintf(dir_path, "%s/%s", path, entry->d_name);
 
             // Build sub-directory
-            BuiltFiles* sub_built = build_directory(buildfile, sysroot, dir_path);
+            BuiltFiles* sub_built =
+                build_directory(buildfile, sysroot, dir_path);
             if (sub_built == NULL) {
                 free(dir_path);
                 free(target_path);
@@ -132,7 +135,8 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
 
             int name_length = strlen(entry->d_name);
             int source_length = path_length + 1 + name_length + 1;
-            int target_length = path_length + 1 + name_length - extension_length + 1 + 1;
+            int target_length =
+                path_length + 1 + name_length - extension_length + 1 + 1;
             if (!extension)
                 target_length++;
 
@@ -156,11 +160,13 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
             }
 
             // Build file if needed
-            char* command = construct_command(buildfile->languages, sysroot, source, target, buildfile->type == BUILDFILE_TYPE_LIBRARY);
+            char* command =
+                construct_command(buildfile->languages, sysroot, source, target,
+                                  buildfile->type == BUILDFILE_TYPE_LIBRARY);
             if (command != NULL) {
                 push_built_file(built_files, target, build);
                 if (build) {
-                    printf("Compiling %s . . .\n", source);
+                    printf("   \x1B[32;1mCompiling\x1B[0m %s . . .\n", source);
 
                     if (system(command) != EXIT_SUCCESS) {
                         fprintf(stderr, "Error while building %s\n", source);
@@ -185,8 +191,10 @@ BuiltFiles* build_directory(Buildfile* buildfile, const char* sysroot, const cha
     return built_files;
 }
 
-int build_priority(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
-    if (buildfile->type != BUILDFILE_TYPE_GROUP || buildfile->priority->queue_length == 0)
+int build_priority(Buildfile* buildfile, const char* sysroot,
+                   const char* argv_0) {
+    if (buildfile->type != BUILDFILE_TYPE_GROUP ||
+        buildfile->priority->queue_length == 0)
         return 0;
 
     char* command;
@@ -199,7 +207,8 @@ int build_priority(Buildfile* buildfile, const char* sysroot, const char* argv_0
     }
 
     for (int i = 0; i < buildfile->priority->queue_length; i++) {
-        printf("Building %s . . .\n", buildfile->priority->queue[i]);
+        printf("    \x1B[32;1mBuilding\x1B[0m %s . . .\n",
+               buildfile->priority->queue[i]);
 
         // Execute build on the sub-directory
         chdir(buildfile->priority->queue[i]);
@@ -207,7 +216,8 @@ int build_priority(Buildfile* buildfile, const char* sysroot, const char* argv_0
         chdir("..");
 
         if (status != EXIT_SUCCESS) {
-            fprintf(stderr, "Error whild building sub-project '%s'\n", buildfile->priority->queue[i]);
+            fprintf(stderr, "Error whild building sub-project '%s'\n",
+                    buildfile->priority->queue[i]);
             free(command);
             return -1;
         }
@@ -225,7 +235,8 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
         DIR* directory = opendir(".");
         if (directory == NULL) {
             int err = errno;
-            fprintf(stderr, "Error while opening current directory: %s\n", strerror(err));
+            fprintf(stderr, "Error while opening current directory: %s\n",
+                    strerror(err));
             return -1;
         }
 
@@ -249,7 +260,8 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
 
                 int done = 0;
                 for (int i = 0; i < buildfile->priority->queue_length; i++) {
-                    if (strcmp(buildfile->priority->queue[i], entry->d_name) == 0) {
+                    if (strcmp(buildfile->priority->queue[i], entry->d_name) ==
+                        0) {
                         done = 1;
                         break;
                     }
@@ -258,7 +270,8 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
                 if (done)
                     continue;
 
-                printf("Building %s . . .\n", entry->d_name);
+                printf("    \x1B[32;1mBuilding\x1B[0m %s . . .\n",
+                       entry->d_name);
 
                 // Execute build on the sub-directory
                 chdir(entry->d_name);
@@ -266,7 +279,8 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
                 chdir("..");
 
                 if (status != EXIT_SUCCESS) {
-                    fprintf(stderr, "Error whild building sub-project '%s'\n", entry->d_name);
+                    fprintf(stderr, "Error whild building sub-project '%s'\n",
+                            entry->d_name);
                     free(command);
                     closedir(directory);
                     return -1;
@@ -280,7 +294,8 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
         closedir(directory);
     } else {
         // Build source files
-        BuiltFiles* built_files = build_directory(buildfile, sysroot, SOURCE_DIRECTORY);
+        BuiltFiles* built_files =
+            build_directory(buildfile, sysroot, SOURCE_DIRECTORY);
         if (built_files == NULL)
             return -1;
 
@@ -291,7 +306,7 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
 
         char* target_name = generate_target_name(buildfile);
 
-        printf("Linking %s . . .\n", target_name);
+        printf("     \x1B[32;1mLinking\x1B[0m %s . . .\n", target_name);
 
         if (buildfile->type == BUILDFILE_TYPE_LIBRARY) {
             // Link objects as static library
@@ -319,17 +334,23 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
             // Build objects
             for (int i = 0; i < buildfile->objects->buffer_length; i++) {
                 Object* object = buildfile->objects->buffer[i];
-                char* command = construct_command_language(object->language, sysroot, object->source, object->target, buildfile->type == BUILDFILE_TYPE_LIBRARY);
+                char* command = construct_command_language(
+                    object->language, sysroot, object->source, object->target,
+                    buildfile->type == BUILDFILE_TYPE_LIBRARY);
                 if (command == NULL) {
-                    fprintf(stderr, "Invalid source file (%s) for building %s\n", object->source, object->target);
+                    fprintf(stderr,
+                            "Invalid source file (%s) for building %s\n",
+                            object->source, object->target);
                     free(target_name);
                     destroy_builtfiles(built_files);
                     return -1;
                 }
 
-                printf("Compiling %s . . .\n", object->source);
+                printf("    \x1B[32;1mCompiling\x1B[0m %s . . .\n",
+                       object->source);
                 if (system(command) != EXIT_SUCCESS) {
-                    fprintf(stderr, "Error while compiling %s\n", object->source);
+                    fprintf(stderr, "Error while compiling %s\n",
+                            object->source);
                     free(target_name);
                     free(command);
                     destroy_builtfiles(built_files);

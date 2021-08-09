@@ -16,14 +16,16 @@ int install_file(const char* source_name, const char* target_name) {
     FILE* source = fopen(source_name, "r");
     if (source == NULL) {
         int err = errno;
-        fprintf(stderr, "Error while opening %s: %s\n", source_name, strerror(err));
+        fprintf(stderr, "Error while opening %s: %s\n", source_name,
+                strerror(err));
         return -1;
     }
 
     FILE* target = fopen(target_name, "w");
     if (target == NULL) {
         int err = errno;
-        fprintf(stderr, "Error while opening %s: %s\n", target_name, strerror(err));
+        fprintf(stderr, "Error while opening %s: %s\n", target_name,
+                strerror(err));
         fclose(source);
         return -1;
     }
@@ -55,7 +57,8 @@ int install_directory(const char* source_path, const char* target_path) {
     DIR* directory = opendir(source_path);
     if (directory == NULL) {
         int err = errno;
-        fprintf(stderr, "Error while opening %s: %s\n", source_path, strerror(err));
+        fprintf(stderr, "Error while opening %s: %s\n", source_path,
+                strerror(err));
         return -1;
     }
 
@@ -98,8 +101,10 @@ int install_directory(const char* source_path, const char* target_path) {
     return 0;
 }
 
-int install_priority(Buildfile* buildfile, const char* prefix, const char* sysroot, const char* argv_0) {
-    if (buildfile->type != BUILDFILE_TYPE_GROUP || buildfile->priority->queue_length == 0)
+int install_priority(Buildfile* buildfile, const char* prefix,
+                     const char* sysroot, const char* argv_0) {
+    if (buildfile->type != BUILDFILE_TYPE_GROUP ||
+        buildfile->priority->queue_length == 0)
         return 0;
 
     // Create command
@@ -107,8 +112,10 @@ int install_priority(Buildfile* buildfile, const char* prefix, const char* sysro
 
     if (prefix) {
         if (sysroot) {
-            command = malloc(strlen(argv_0) + 19 + strlen(prefix) + 11 + strlen(sysroot));
-            sprintf(command, "%s install --prefix %s --sysroot %s", argv_0, prefix, sysroot);
+            command = malloc(strlen(argv_0) + 19 + strlen(prefix) + 11 +
+                             strlen(sysroot));
+            sprintf(command, "%s install --prefix %s --sysroot %s", argv_0,
+                    prefix, sysroot);
         } else {
             command = malloc(strlen(argv_0) + 19 + strlen(prefix));
             sprintf(command, "%s install --prefix %s", argv_0, prefix);
@@ -124,7 +131,8 @@ int install_priority(Buildfile* buildfile, const char* prefix, const char* sysro
     }
 
     for (int i = 0; i < buildfile->priority->queue_length; i++) {
-        printf("Installing %s . . .\n", buildfile->priority->queue[i]);
+        printf("  \x1B[32;1mInstalling\x1B[0m %s . . .\n",
+               buildfile->priority->queue[i]);
 
         // Execute build on the sub-directory
         chdir(buildfile->priority->queue[i]);
@@ -132,7 +140,8 @@ int install_priority(Buildfile* buildfile, const char* prefix, const char* sysro
         chdir("..");
 
         if (status != EXIT_SUCCESS) {
-            fprintf(stderr, "Error while installing sub-project '%s'\n", buildfile->priority->queue[i]);
+            fprintf(stderr, "Error while installing sub-project '%s'\n",
+                    buildfile->priority->queue[i]);
             free(command);
             return -1;
         }
@@ -151,7 +160,8 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
         DIR* directory = opendir(".");
         if (directory == NULL) {
             int err = errno;
-            fprintf(stderr, "Error while opening current directory: %s\n", strerror(err));
+            fprintf(stderr, "Error while opening current directory: %s\n",
+                    strerror(err));
             return -1;
         }
 
@@ -160,7 +170,8 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
 
         if (prefix) {
             command = malloc(strlen(argv_0) + 30 + strlen(prefix));
-            sprintf(command, "%s install --no-build --prefix %s", argv_0, prefix);
+            sprintf(command, "%s install --no-build --prefix %s", argv_0,
+                    prefix);
         } else {
             command = malloc(strlen(argv_0) + 20);
             sprintf(command, "%s install --no-build", argv_0);
@@ -176,7 +187,8 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
 
                 int done = 0;
                 for (int i = 0; i < buildfile->priority->queue_length; i++) {
-                    if (strcmp(buildfile->priority->queue[i], entry->d_name) == 0) {
+                    if (strcmp(buildfile->priority->queue[i], entry->d_name) ==
+                        0) {
                         done = 1;
                         break;
                     }
@@ -185,7 +197,8 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
                 if (done)
                     continue;
 
-                printf("Installing %s . . .\n", entry->d_name);
+                printf("  \x1B[32;1mInstalling\x1B[0m %s . . .\n",
+                       entry->d_name);
 
                 // Execute build on the sub-directory
                 chdir(entry->d_name);
@@ -193,7 +206,8 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
                 chdir("..");
 
                 if (status != EXIT_SUCCESS) {
-                    fprintf(stderr, "Error while installing sub-project '%s'\n", entry->d_name);
+                    fprintf(stderr, "Error while installing sub-project '%s'\n",
+                            entry->d_name);
                     free(command);
                     closedir(directory);
                     return -1;
@@ -209,8 +223,11 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
         if (prefix == NULL)
             prefix = DEFAULT_PREFIX;
 
-        char* target_name = malloc(strlen(prefix) + 5 + strlen(source_name) + 1);
-        sprintf(target_name, "%s/%s/%s", prefix, buildfile->type == BUILDFILE_TYPE_LIBRARY ? "lib" : "bin", source_name);
+        char* target_name =
+            malloc(strlen(prefix) + 5 + strlen(source_name) + 1);
+        sprintf(target_name, "%s/%s/%s", prefix,
+                buildfile->type == BUILDFILE_TYPE_LIBRARY ? "lib" : "bin",
+                source_name);
 
         if (install_file(source_name, target_name) < 0) {
             free(target_name);
@@ -234,10 +251,14 @@ int install(Buildfile* buildfile, const char* prefix, const char* argv_0) {
 
             // Install objects
             for (int i = 0; i < buildfile->objects->buffer_length; i++) {
-                char* object_name = malloc(strlen(prefix) + 5 + strlen(buildfile->objects->buffer[i]->target) + 1);
-                sprintf(object_name, "%s/%s/%s", prefix, "lib", buildfile->objects->buffer[i]->target);
+                char* object_name =
+                    malloc(strlen(prefix) + 5 +
+                           strlen(buildfile->objects->buffer[i]->target) + 1);
+                sprintf(object_name, "%s/%s/%s", prefix, "lib",
+                        buildfile->objects->buffer[i]->target);
 
-                if (install_file(buildfile->objects->buffer[i]->target, object_name) < 0) {
+                if (install_file(buildfile->objects->buffer[i]->target,
+                                 object_name) < 0) {
                     free(object_name);
                     return -1;
                 }

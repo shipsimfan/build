@@ -18,7 +18,8 @@ int clean_directory(const char* path) {
     DIR* directory = opendir(path);
     if (directory == NULL) {
         int err = errno;
-        fprintf(stderr, "Error while opening %s directory: %s\n", path, strerror(err));
+        fprintf(stderr, "Error while opening %s directory: %s\n", path,
+                strerror(err));
         return -1;
     }
 
@@ -57,7 +58,8 @@ int clean(Buildfile* buildfile, const char* argv_0) {
         DIR* directory = opendir(".");
         if (directory == NULL) {
             int err = errno;
-            fprintf(stderr, "Error while opening current directory: %s\n", strerror(err));
+            fprintf(stderr, "Error while opening current directory: %s\n",
+                    strerror(err));
             return -1;
         }
 
@@ -73,7 +75,8 @@ int clean(Buildfile* buildfile, const char* argv_0) {
                 if (entry->d_name[0] == '.')
                     continue;
 
-                printf("Cleaning %s . . .\n", entry->d_name);
+                printf("    \x1B[32;1mCleaning\x1B[0m %s . . .\n",
+                       entry->d_name);
 
                 // Execute build on the sub-directory
                 chdir(entry->d_name);
@@ -81,7 +84,8 @@ int clean(Buildfile* buildfile, const char* argv_0) {
                 chdir("..");
 
                 if (status != EXIT_SUCCESS) {
-                    fprintf(stderr, "Error while cleaning sub-project '%s'\n", entry->d_name);
+                    fprintf(stderr, "Error while cleaning sub-project '%s'\n",
+                            entry->d_name);
                     free(command);
                     closedir(directory);
                     return -1;
