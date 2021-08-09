@@ -10,5 +10,8 @@ all: $(TARGET)
 install: $(TARGET)
 	@cp $(TARGET) /usr/local/bin/
 
+clean:
+	@rm -f $(TARGET)
+
 $(TARGET): $(SRC_FILES)
 	$(CC) $(CC_FLAGS) -o $@ $^

@@ -198,16 +198,11 @@ int build(Buildfile* buildfile, const char* sysroot, const char* argv_0) {
         // Create command
         char* command;
         if (sysroot) {
-            int length = strlen(argv_0) + 17 + strlen(sysroot) + 1;
-            command = malloc(length);
-            strcpy(command, argv_0);
-            strcat(command, " build --sysroot ");
-            strcat(command, sysroot);
+            command = malloc(strlen(argv_0) + 17 + strlen(sysroot) + 1);
+            sprintf(command, "%s build --sysroot %s", argv_0, sysroot);
         } else {
-            int length = strlen(argv_0) + 7;
-            command = malloc(length);
-            strcpy(command, argv_0);
-            strcat(command, " build");
+            command = malloc(strlen(argv_0) + 7);
+            sprintf(command, "%s build", argv_0);
         }
 
         // Loop through sub-directories

@@ -12,6 +12,7 @@ Options* create_options() {
     options->prefix = NULL;
     options->sysroot = NULL;
     options->verbose = 0;
+    options->no_build = 0;
     return options;
 }
 
@@ -75,8 +76,7 @@ Options* parse_arguments(const char* argv[]) {
             }
 
             options->prefix = copy_path(argv[i]);
-        } else if (strcmp(argv[i], "-s") == 0 ||
-                   strcmp(argv[i], "--sysroot") == 0) {
+        } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--sysroot") == 0) {
             i++;
             if (argv[i] == NULL) {
                 fprintf(stderr, "No path after '-sysroot'\n");
@@ -89,13 +89,14 @@ Options* parse_arguments(const char* argv[]) {
             }
 
             options->sysroot = copy_path(argv[i]);
-        } else if (strcmp(argv[i], "-v") == 0 ||
-                   strcmp(argv[i], "--verbose") == 0)
+        } else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0)
             options->verbose = 1;
         else if (strcmp(argv[i], "--version") == 0) {
             destroy_options(options);
             display_version();
-        } else {
+        } else if (strcmp(argv[i], "--no-build") == 0)
+            options->no_build = 1;
+        else {
             fprintf(stderr, "Unknown argument '%s'\n", argv[i]);
             return destroy_options(options);
         }

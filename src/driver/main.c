@@ -17,8 +17,7 @@ int main(int argc, const char* argv[]) {
         exit(EXIT_FAILURE);
 
     // Parse buildfile
-    Buildfile* buildfile =
-        parse_buildfile(options->verbose, BUILDFILE_FILEPATH);
+    Buildfile* buildfile = parse_buildfile(options->verbose, BUILDFILE_FILEPATH);
     if (buildfile == NULL) {
         destroy_options(options);
         exit(EXIT_FAILURE);
@@ -32,17 +31,19 @@ int main(int argc, const char* argv[]) {
         break;
 
     case COMMAND_CLEAN:
-        status = clean(buildfile);
+        status = clean(buildfile, argv[0]);
         break;
 
     case COMMAND_INSTALL:
-        status = build(buildfile, options->sysroot, argv[0]);
-        if (status != 0)
-            break;
+        if (options->no_build == 0) {
+            status = build(buildfile, options->sysroot, argv[0]);
+            if (status != 0)
+                break;
+        }
 
         if (options->prefix == NULL)
             options->prefix = copy_string(DEFAULT_PREFIX);
-        status = install(buildfile, options->prefix);
+        status = install(buildfile, options->prefix, argv[0]);
         break;
 
     case COMMAND_INVALID:

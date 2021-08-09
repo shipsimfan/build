@@ -3,6 +3,6 @@
 
 #include "../parser/buildfile.h"
 
-int install(Buildfile* buildfile, const char* prefix);
+int install(Buildfile* buildfile, const char* prefix, const char* argv_0);
 
 #endif

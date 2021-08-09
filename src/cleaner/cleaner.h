@@ -3,6 +3,6 @@
 
 #include "../parser/buildfile.h"
 
-int clean(Buildfile* buildfile);
+int clean(Buildfile* buildfile, const char* argv_0);
 
 #endif
